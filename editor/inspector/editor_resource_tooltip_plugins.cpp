@@ -72,6 +72,22 @@ VBoxContainer *EditorResourceTooltipPlugin::make_default_tooltip(const String &p
 		if (f.is_valid()) {
 			Label *label = memnew(Label(vformat(TTR("Size: %s"), String::humanize_size(f->get_length()))));
 			vb->add_child(label);
+
+			uint64_t mtime = FileAccess::get_modified_time(p_resource_path);
+			if (mtime > 0) {
+				Dictionary dt = Time::get_singleton()->get_datetime_dict_from_unix_time(mtime);
+
+				String formatted = vformat(
+						"%04d-%02d-%02d %02d:%02d",
+						(int)dt["year"],
+						(int)dt["month"],
+						(int)dt["day"],
+						(int)dt["hour"],
+						(int)dt["minute"]);
+
+				Label *mtime_label = memnew(Label(vformat(TTR("Modified: %s"), formatted)));
+				vb->add_child(mtime_label);
+			}
 		} else {
 			Label *label = memnew(Label(TTR("Invalid file or broken link.")));
 			label->add_theme_color_override(SceneStringName(font_color), EditorNode::get_singleton()->get_gui_base()->get_theme_color(SNAME("error_color"), EditorStringName(Editor)));
